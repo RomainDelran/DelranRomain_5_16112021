@@ -49,7 +49,7 @@ fetch("http://localhost:3000/api/products")
   .then(function(json) {
     // recuperer la liste des canapé
     listeCanape = json ;
-    console.log(listeCanape[0]);
+    
 
 
     //met en place tout les canape sur la page d'acceuil
