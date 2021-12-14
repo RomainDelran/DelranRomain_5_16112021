@@ -133,39 +133,6 @@ function placerLesElements (canapeTemp) {
     let monStockage = localStorage;
     let maListeDeCanape = [];
  
-
-    //transforme le localStorage en liste de canape
-    function localStorageToListeCanape () {
-        let monStockageTemp = localStorage;
-        let nombreDeCanapes = (monStockageTemp.length)/3;
-        maListeDeCanape = [];
-        for (let i =0 ; i<nombreDeCanapes ; i++){
-            let canapeIdTemp =localStorage.getItem("canapeId"+i);
-            let canapeColorTemp =localStorage.getItem("canapeColor"+i);
-            let canapeQuantiteTemp =parseInt(localStorage.getItem("canapeQuantite"+i), 10);
-            let monCanapeTemp = []
-            monCanapeTemp.push (canapeIdTemp);
-            monCanapeTemp.push (canapeColorTemp);
-            monCanapeTemp.push (canapeQuantiteTemp);
-            maListeDeCanape.push (monCanapeTemp);
-
-        }
-    }
-
-    //transforme la liste de canape en local storage
-    function listeCanapeToLocalStorage () {
-        
-        let nombreDeCanapes = (maListeDeCanape.length);
-
-        localStorage.clear();
-
-        for (let i =0 ; i<nombreDeCanapes ; i++){
-            localStorage.setItem("canapeId"+i ,maListeDeCanape[i][0] );
-            localStorage.setItem("canapeColor"+i ,maListeDeCanape[i][1] ); 
-            localStorage.setItem("canapeQuantite"+i ,maListeDeCanape[i][2] );    
-        }
-    }
-
    //Verifi que 2 canape ne sont pas identique retourne un booleen
    function siDeuxCanapeSontIdentique (canapeA , canapeB) {
     if ((canapeA[0] == canapeB[0]) & (canapeA[1] == canapeB[1])){
@@ -175,56 +142,49 @@ function placerLesElements (canapeTemp) {
     }
 }
 
-
-
-    //fonction qui verifi et suprime les canape en doublon
+    //fonction qui verifie et suprime les canapes en doublon
     function suprimerUnCanapeEnDoublon () {
         
         for (i=0 ; i<(maListeDeCanape.length) ; i++){
             for (n=(i+1) ; n<(maListeDeCanape.length); n++){
                 if ((siDeuxCanapeSontIdentique (maListeDeCanape[i] , maListeDeCanape[n])) & (i!==n)){
                     
-                    (maListeDeCanape[i])[2] = (maListeDeCanape[i])[2] + (maListeDeCanape[n])[2];
+                    (maListeDeCanape[i])[2] = parseInt((maListeDeCanape[i])[2], 10) + parseInt((maListeDeCanape[n])[2], 10);
                    
-                    maListeDeCanape.splice(n);
+                    maListeDeCanape.splice(n,1);
                     n=n-1;
                 }
             }
         }
     }
 
- 
+    //fonction ajoutant au localstorage un canape en elimnant les doublons
+    function addCanapeToLocalStorage () {
 
-    //ajouter un produit selectioné avec un numero de canape
-    function ajouterUnProduitSelectionne (n , produitsSelectioneTemp){
-        
-        monStockage.setItem("canapeId"+n ,produitsSelectioneTemp[0] );
-        monStockage.setItem("canapeColor"+n ,produitsSelectioneTemp[1] ); 
-        monStockage.setItem("canapeQuantite"+n ,produitsSelectioneTemp[2] );
-    }
-
-
-
-    
-
-
-
-    addToCart.addEventListener('click', event => {
         if ((id != null)&(quantiteUtilisateur>0)&(quantiteUtilisateur<101)&(couleurUtilisateur != null)&(couleurUtilisateur !== "")) {
-            //localStorage.clear();
 
-            produitsSelectione = [id , couleurUtilisateur , quantiteUtilisateur ];
-            let n = (localStorage.length)/3;
-            ajouterUnProduitSelectionne (n,produitsSelectione);
+            //transforme le localStorage en liste de canape
+            if (JSON.parse(localStorage.getItem("listeCanape"))!==null){
+                maListeDeCanape = JSON.parse(localStorage.getItem("listeCanape"));
+            }
             
-            localStorageToListeCanape ();
+            //ajouter un produit selectioné a la fin de la liste
+            produitsSelectione = [id , couleurUtilisateur , parseInt(quantiteUtilisateur, 10) ];
+            maListeDeCanape.push(produitsSelectione); 
             
             suprimerUnCanapeEnDoublon ();
 
-            listeCanapeToLocalStorage ();
-            
-            console.log (maListeDeCanape);
-            console.log(localStorage);
+            //transforme la liste de canape en local storage
+            localStorage.setItem("listeCanape",JSON.stringify(maListeDeCanape));
         }
-      } );
+    }
+
+    addToCart.addEventListener('click', event => {
+        
+            addCanapeToLocalStorage ();
+            
+            console.log(maListeDeCanape);
+            console.log(JSON.parse(localStorage.getItem("listeCanape")));
+        }
+       );
 
