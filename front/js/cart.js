@@ -406,7 +406,7 @@ ButonSubmit.addEventListener('click', event => {
 
     
     if ((validateName(entreCity.value))&(validateAdresse(entreAddress.value))&(validateName(entreLastName.value))&(validateName(entreFirstName.value)) ){
-        fetch("http:../../back/controllers/product.js", {
+        fetch("http://romaindelran.github.io/DelranRomain_5_16112021/back/controllers/product.js", {
             method:"POST",
             headers: {
                 'Accept': 'application/json', 
