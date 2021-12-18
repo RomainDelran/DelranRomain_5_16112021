@@ -3,42 +3,6 @@
 
 let maListeDeCanape = [];
 
-////
-/*
-    let produitsSelectione1 = ["a557292fe5814ea2b15c6ef4bd73ed83" , "Pink" , 3 ];
-    let produitsSelectione2 = ["415b7cacb65d43b2b5c1ff70f3393ad1" , "Black/Red" , 5 ];
-
-    maListeDeCanape.push(produitsSelectione1);
-    maListeDeCanape.push(produitsSelectione2);
-    console.log(localStorage);
-    console.log(maListeDeCanape);
-
-    //fonction transformant le localstorage en liste de canape et en elimnant les doublons
-    function canapeToLocalStorage2 () {
-
-        //transforme le localStorage en liste de canape
-        if (JSON.parse(localStorage.getItem("listeCanape"))!==null){
-           // maListeDeCanape = JSON.parse(localStorage.getItem("listeCanape"));
-        } 
-        
-        suprimerUnCanapeEnDoublon ();
-
-        //transforme la liste de canape en local storage
-        localStorage.setItem("listeCanape",JSON.stringify(maListeDeCanape));
-}
-
-canapeToLocalStorage2 ();
-*/
-////
-
-
-
-
- 
-
-
-
-
     let monStockage = localStorage;
     //Verifi que 2 canape ne sont pas identique retourne un booleen
     function siDeuxCanapeSontIdentique (canapeA , canapeB) {
@@ -198,8 +162,7 @@ function quantiteArticleEtPrixTotal () {
     
     for (i=0 ; i<maListeDeCanape.length ; i++) {
         quantiteArticle = (parseInt(quantiteArticle, 10)) + (parseInt(((maListeDeCanape[i])[2]), 10));
-        //console.log(parseInt(quantiteArticle, 10));
-
+        
         let bonCanapeDansLaListe = trouverCanape (maListeDeCanape[i],listeDeTousLesCanapes);
         prixTotal = parseInt(prixTotal, 10) + (parseInt((bonCanapeDansLaListe.price), 10) * (parseInt((maListeDeCanape[i])[2], 10))) ;
     }
@@ -313,7 +276,7 @@ let entreFirstNameErrorMsg = document.getElementById ('firstNameErrorMsg');
 function validationPrenom (){
     if (validateName(entreFirstName.value)){
         entreFirstNameErrorMsg.textContent = "";
-        contact.firstName = entreFirstName.value;
+        contacts.firstName = entreFirstName.value;
     }else {
         entreFirstNameErrorMsg.textContent = "Erreur: le nom doit être composé uniquement de caractére";
     }
@@ -324,7 +287,7 @@ let entreLastNameErrorMsg = document.getElementById ('lastNameErrorMsg');
 function validationNom (){
     if (validateName(entreLastName.value)){
         entreLastNameErrorMsg.textContent = "";
-        contact.lastName = entreLastName.value;
+        contacts.lastName = entreLastName.value;
     }else {
         entreLastNameErrorMsg.textContent = "Erreur: le nom doit être composé uniquement de caractére";
     }
@@ -341,7 +304,7 @@ let entreAddressErrorMsg = document.getElementById ('addressErrorMsg');
 function validationAdresse (){
     if (validateAdresse(entreAddress.value)){
         entreAddressErrorMsg.textContent = "";
-        contact.address = entreAddress.value;
+        contacts.address = entreAddress.value;
     }else {
         entreAddressErrorMsg.textContent = "Erreur: adresse invalid";
     }
@@ -352,7 +315,7 @@ let entreCityErrorMsg= document.getElementById ('cityErrorMsg');
 function validationCity (){
     if (validateName(entreCity.value)){
         entreCityErrorMsg.textContent = "";
-        contact.city = entreCity.value;
+        contacts.city = entreCity.value;
     }else {
         entreCityErrorMsg.textContent = "Erreur: ville invalid";
     }
@@ -369,7 +332,7 @@ let entreEmailErrorMsg = document.getElementById ('emailErrorMsg');
 function validationEmail (){
     if (validateEmail(entreEmail.value)){
         emailErrorMsg.textContent = "";
-        contact.email = entreEmail.value;
+        contacts.email = entreEmail.value;
     }else {
         emailErrorMsg.textContent = "Erreur: Email invalide";
     }
@@ -389,36 +352,47 @@ function tableauId (){
 }
 
 
-//Verifi tout les champs avant validation
+//Verifi tout les champs avant validation et envoi l'IdOrder a la page confirmation
 let products = [];
-let contact = new Object();
+let contacts = new Object();
 let ButonSubmit = document.getElementById ('order');
 ButonSubmit.addEventListener('click', event => {
-           
+    event.preventDefault();
     validationPrenom();
     validationNom();
     validationAdresse ();
     validationCity ();
     validationEmail ();
 
-    products = [];
+    
     tableauId ();
 
-    
-    if ((validateName(entreCity.value))&(validateAdresse(entreAddress.value))&(validateName(entreLastName.value))&(validateName(entreFirstName.value)) ){
-        fetch("http://romaindelran.github.io/DelranRomain_5_16112021/back/controllers/product.js", {
-            method:"POST",
-            headers: {
-                'Accept': 'application/json', 
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(contact) //JSON.stringify(products)
+    let formData = {
+        contact:contacts,
+        products:products
         }
         
-        );
+    console.log(formData);
+    if (validateEmail(entreEmail.value)&(validateName(entreCity.value))&(validateAdresse(entreAddress.value))&(validateName(entreLastName.value))&(validateName(entreFirstName.value)) ){
+        fetch("http://localhost:3000/api/products/order",{ 
+            method: "POST",
+            body: JSON.stringify(formData),
+            headers: {"Content-type": "application/json; charset=UTF-8"}
+        })
+        
+        .then(function(response) {
+            if (response.ok) {
+                return response.json();
+            }
+          })
+          
+          .then(function(json) {
+              location.href = "confirmation.html?id="+json.orderId;
+              console.log(json);
+            })
+
+        .catch('Il y a eu un problème avec l\'opération fetch2 ');
     }
-    
-    console.log(JSON.stringify(contact));
-    console.log(products);
+  
             
 });
